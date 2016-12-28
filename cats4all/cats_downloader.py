@@ -103,7 +103,7 @@ def flatten_items(items, client):
         elif type(item) is imgurpython.imgur.models.gallery_image.GalleryImage:
             yield ImageData(item.id, item.link, item.title, item.height, item.width)
 
-def get_images_data_by_tag(imgur_config, tag, num=150, sort='viral'):
+def get_images_data_by_tag(imgur_config, tag, predicate, num=150, sort='viral'):
     client = imgurpython.ImgurClient(imgur_config.id, imgur_config.secret)
     images_by_tag = client.gallery_tag(tag, sort=sort)
     images_data = [i for i in flatten_items(images_by_tag.items, client) if predicate(i)]
@@ -112,12 +112,12 @@ def get_images_data_by_tag(imgur_config, tag, num=150, sort='viral'):
     return images_data[:num]
 
 
-def get_images_of_tag(imgur_config, tag, db_file_path, num=150, sort='viral'):
+def get_images_of_tag(imgur_config, tag, db_file_path, predicate, num=150, sort='viral'):
     current_page = 1
     continue_download = True
     count_images = 0
     while continue_download:
-        images_data = get_images_data_by_tag(imgur_config, tag, num, sort)
+        images_data = get_images_data_by_tag(imgur_config, tag, predicate, num, sort)
 
         new_images_data = remove_existing(images_data, db_file_path)
         print len(new_images_data)
@@ -159,7 +159,7 @@ def main():
     imgur_config = get_config(args.imgur_config_path)
     for tag in args.tags:
         print 'Downloading images for tag ' + tag
-        get_images_of_tag(imgur_config, tag, args.db_file_path, sort='time')
+        get_images_of_tag(imgur_config, tag, args.db_file_path, args.predicate, sort='time')
 
 
 if __name__ == '__main__':
