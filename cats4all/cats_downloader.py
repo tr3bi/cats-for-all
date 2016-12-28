@@ -70,8 +70,11 @@ def does_image_exist(image_id, db_file_path, table_name='cats'):
         db_connection.close()
 
 
-def predicate(image):
+def choose_all(image):
     return True
+
+
+def choose_only_medium(image):
     if image.height < 500 or image.width < 300:
         return False
     if image.height > 1200:
@@ -140,6 +143,7 @@ def parse_arguments():
     parser.add_argument('tags', nargs='+', default=['cat'], help='The tags the should be examined.')
     parser.add_argument('--db-file', '-d', dest='db_file_path', default=DEFAULT_DB_FILE_PATH, help='The path to the DB file contains the already downloaded pictures.')
     parser.add_argument('--imgur-config', '-f', dest='imgur_config_path', default=DEFAULT_IMGUR_CONFIG_PATH, help='The path to the JSON file contains the imgur secret and application ID.')
+    parser.add_argument('--only-medium', '-m', dest='predicate', default=choose_all, const=choose_only_medium, action='store_const', help='If supplied, only medium picutres will be saved.')
     return parser.parse_args()
 
 
