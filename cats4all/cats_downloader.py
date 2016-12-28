@@ -23,8 +23,8 @@ def get_config(config_path='./config.json'):
     return ImgurConfig(config['id'], config['secret'])
 
 
-def init_db(table_name='cats'):
-    db_connection = sqlite3.connect(DB_FILE_NAME)
+def init_db(db_file_path, table_name='cats'):
+    db_connection = sqlite3.connect(db_file_path)
     cursor = db_connection.cursor()
     cursor.execute('create table %s(image_id, date)' % (table_name,))
     db_connection.commit()
@@ -32,7 +32,7 @@ def init_db(table_name='cats'):
     db_connection.close()
 
 
-def get_all_from__db(table_name='cats', db_file_name=DB_FILE_NAME):
+def get_all_from__db(table_name='cats', db_file_name=DEFAULT_DB_FILE_PATH):
     db_connection = sqlite3.connect(db_file_name)
     cursor = db_connection.cursor()
     cursor.execute('select * from %s' % (table_name,))
@@ -41,24 +41,24 @@ def get_all_from__db(table_name='cats', db_file_name=DB_FILE_NAME):
     db_connection.close()
 
 
-def add_to_db(image_id, date, table_name='cats'):
-    db_connection = sqlite3.connect(DB_FILE_NAME)
+def add_to_db(image_id, date, db_file_path, table_name='cats'):
+    db_connection = sqlite3.connect(db_file_path)
     cursor = db_connection.cursor()
     cursor.execute('insert into %s values (?, ?)' % (table_name,), (image_id, date))
     db_connection.commit()
     db_connection.close()
 
 
-def add_bulk_to_db(image_iter, table_name='cats'):
-    db_connection = sqlite3.connect(DB_FILE_NAME)
+def add_bulk_to_db(image_iter, db_file_path=DEFAULT_DB_FILE_PATH, table_name='cats'):
+    db_connection = sqlite3.connect(db_file_path)
     cursor = db_connection.cursor()
     cursor.execute('insert into %s values (?, ?)' % (table_name,), image_iter)
     db_connection.commit()
     db_connection.close()
 
 
-def does_image_exist(image_id, table_name='cats'):
-    db_connection = sqlite3.connect(DB_FILE_NAME)
+def does_image_exist(image_id, db_file_path, table_name='cats'):
+    db_connection = sqlite3.connect(db_file_path)
     try:
         cursor = db_connection.cursor()
         cursor.execute('select * from %s where image_id=?' % (table_name,), (image_id,))
@@ -82,11 +82,11 @@ def get_todays_dir(dir_frmt=DIR_NAME_FRMT):
     return dir_frmt % (time.strftime('%Y-%m-%d'))
 
 
-def remove_existing(images_data):
+def remove_existing(images_data, db_file_path):
     print str(len(images_data)) + '!!!'
     nonexisiting_images = []
     for i in images_data:
-        if not does_image_exist(i.id):
+        if not does_image_exist(i.id, db_file_path):
             nonexisiting_images.append(i)
     return nonexisiting_images
 
@@ -108,14 +108,14 @@ def get_images_data_by_tag(imgur_config, tag, num=150, sort='viral'):
     return images_data[:num]
 
 
-def get_images_of_tag(imgur_config, tag, num=150, sort='viral'):
+def get_images_of_tag(imgur_config, tag, db_file_path, num=150, sort='viral'):
     current_page = 1
     continue_download = True
     count_images = 0
     while continue_download:
         images_data = get_images_data_by_tag(imgur_config, tag, num, sort)
 
-        new_images_data = remove_existing(images_data)
+        new_images_data = remove_existing(images_data, db_file_path)
         print len(new_images_data)
         count_images += len(new_images_data)
         curr_date = time.strftime('%Y-%m-%d')
@@ -128,7 +128,7 @@ def get_images_of_tag(imgur_config, tag, num=150, sort='viral'):
                 print 'Could not print image name. ID ' + i.id
             with open(file_name,'wb') as f:
                 f.write(requests.get(i.link).content)
-                add_to_db(i.id, curr_date)
+                add_to_db(i.id, curr_date, db_file_path)
         current_page += 1
         if len(new_images_data) == 0 or count_images >= num:
             continue_download = False
@@ -144,7 +144,7 @@ def parse_arguments():
 def main():
     args = parse_arguments()
     if not os.path.isfile(args.db_file_path):
-        init_db()
+        init_db(args.db_file_path)
 
     cats_dir = get_todays_dir()
     if not os.path.isdir(cats_dir):
@@ -153,7 +153,7 @@ def main():
     imgur_config = get_config()
     for tag in args.tags:
         print 'Downloading images for tag ' + tag
-        get_images_of_tag(imgur_config, tag, sort='time')
+        get_images_of_tag(imgur_config, tag, args.db_file_path, sort='time')
 
 
 if __name__ == '__main__':
