@@ -133,7 +133,7 @@ def get_images_of_tag(imgur_config, tag, db_file_path, predicate, dst_dir, num=M
                 print i.title
             except UnicodeEncodeError as e:
                 print '* Could not print image name. ID ' + i.id
-            with open(file_name,'wb') as f:
+            with open(file_path,'wb') as f:
                 f.write(requests.get(i.link).content)
                 add_to_db(i.id, curr_date, db_file_path)
         current_page += 1
