@@ -9,8 +9,7 @@ import json
 import argparse
 
 DIR_NAME_FRMT = 'cats-%s'
-tags = ['cat', 'cats', 'lolcat', 'lolcats']
-DEFAULT_DB_FILE_PATH = './cats2.db'
+DEFAULT_DB_FILE_PATH = './cats.db'
 DEFAULT_IMGUR_CONFIG_PATH = './config.json'
 
 ImageData = namedtuple('ImageData', ['id', 'link', 'title', 'height', 'width'])
