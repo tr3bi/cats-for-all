@@ -148,6 +148,7 @@ def parse_arguments():
     parser.add_argument('--imgur-config', '-f', dest='imgur_config_path', default=DEFAULT_IMGUR_CONFIG_PATH, help='The path to the JSON file contains the imgur secret and application ID.')
     parser.add_argument('--only-medium', '-m', dest='predicate', default=choose_all, const=choose_only_medium, action='store_const', help='If supplied, only medium picutres will be saved.')
     parser.add_argument('--sort', '-s', dest='sort', default=DEFAULT_SORT, choice=IMGUR_SORT_CHOICES, help='The method used to sort the videos when sampling imgur.')
+    parser.add_argument('--output-path', '-o', dest='output', default=DEFAULT_OUTPUT_PATH, help='The default path to which write the output.')
     return parser.parse_args()
 
 
@@ -159,7 +160,7 @@ def main():
 
     imgur_config = get_config(args.imgur_config_path)
     for tag in args.tags:
-        dst_dir = get_todays_dir(tag)
+        dst_dir = get_todays_dir(tag, base_dir=args.output)
         if not os.path.isdir(dst_dir):
             os.makedirs(dst_dir)
         print '* Downloading images for tag ' + tag
