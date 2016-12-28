@@ -9,7 +9,6 @@ import json
 import argparse
 
 DIR_NAME_FRMT = 'cats-%s'
-tag = 'cat'
 DB_FILE_NAME = 'cats2.db'
 
 ImageData = namedtuple('ImageData', ['id', 'link', 'title', 'height', 'width'])
@@ -136,11 +135,12 @@ def get_images_of_tag(imgur_config, tag, num=150, sort='viral'):
 
 def parse_arguments():
     parser = argparse.ArgumentParser()
-    parser.add_argument('tags', nargs='+', help='The tags the should be examined.')
+    parser.add_argument('tags', nargs='+', default=['cat'], help='The tags the should be examined.')
     return parser.parse_args()
 
 
 def main():
+    args = parse_arguments()
     if not os.path.isfile(DB_FILE_NAME):
         init_db()
 
