@@ -166,6 +166,7 @@ def main():
             os.makedirs(dst_dir)
         print '* Downloading images for tag ' + tag
         get_images_of_tag(imgur_config, tag, args.db_file_path, args.predicate, dst_dir, num=args.max_amount, sort=args.sort)
+    print '* Done processing all tags!'
 
 
 if __name__ == '__main__':
