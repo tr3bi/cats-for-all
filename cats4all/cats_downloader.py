@@ -11,6 +11,8 @@ import argparse
 DIR_NAME_FRMT = 'cats-%s'
 DEFAULT_DB_FILE_PATH = './cats.db'
 DEFAULT_IMGUR_CONFIG_PATH = './config.json'
+IMGUR_SORT_CHOICES = ['viral', 'time']
+DEFAULT_SORT = 'time'
 
 ImageData = namedtuple('ImageData', ['id', 'link', 'title', 'height', 'width'])
 ImgurConfig = namedtuple('ImgurConfig', ['id', 'secret'])
@@ -101,7 +103,7 @@ def flatten_items(items, client):
         elif type(item) is imgurpython.imgur.models.gallery_image.GalleryImage:
             yield ImageData(item.id, item.link, item.title, item.height, item.width)
 
-def get_images_data_by_tag(imgur_config, tag, predicate, num=150, sort='viral'):
+def get_images_data_by_tag(imgur_config, tag, predicate, num=150, sort=DEFAULT_SORT):
     client = imgurpython.ImgurClient(imgur_config.id, imgur_config.secret)
     images_by_tag = client.gallery_tag(tag, sort=sort)
     images_data = [i for i in flatten_items(images_by_tag.items, client) if predicate(i)]
@@ -109,7 +111,7 @@ def get_images_data_by_tag(imgur_config, tag, predicate, num=150, sort='viral'):
     return images_data[:num]
 
 
-def get_images_of_tag(imgur_config, tag, db_file_path, predicate, num=150, sort='viral'):
+def get_images_of_tag(imgur_config, tag, db_file_path, predicate, num=150, sort=DEFAULT_SORT):
     current_page = 1
     continue_download = True
     count_images = 0
@@ -141,6 +143,7 @@ def parse_arguments():
     parser.add_argument('--db-file', '-d', dest='db_file_path', default=DEFAULT_DB_FILE_PATH, help='The path to the DB file contains the already downloaded pictures.')
     parser.add_argument('--imgur-config', '-f', dest='imgur_config_path', default=DEFAULT_IMGUR_CONFIG_PATH, help='The path to the JSON file contains the imgur secret and application ID.')
     parser.add_argument('--only-medium', '-m', dest='predicate', default=choose_all, const=choose_only_medium, action='store_const', help='If supplied, only medium picutres will be saved.')
+    parser.add_argument('--sort', '-s', dest='sort', default=DEFAULT_SORT, choice=IMGUR_SORT_CHOICES, help='The method used to sort the videos when sampling imgur.')
     return parser.parse_args()
 
 
@@ -156,7 +159,7 @@ def main():
     imgur_config = get_config(args.imgur_config_path)
     for tag in args.tags:
         print '* Downloading images for tag ' + tag
-        get_images_of_tag(imgur_config, tag, args.db_file_path, args.predicate, sort='time')
+        get_images_of_tag(imgur_config, tag, args.db_file_path, args.predicate, sort=args.sort)
 
 
 if __name__ == '__main__':
