@@ -164,7 +164,7 @@ def main():
         dst_dir = get_todays_dir(tag, base_dir=args.output)
         if not os.path.isdir(dst_dir):
             os.makedirs(dst_dir)
-        print '* Downloading images for tag ' + tag
+        print '* Checking images for tag ' + tag
         get_images_of_tag(imgur_config, tag, args.db_file_path, args.predicate, dst_dir, num=args.max_amount, sort=args.sort)
     print '* Done processing all tags!'
 
