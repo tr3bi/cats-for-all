@@ -150,7 +150,7 @@ def main():
         os.makedirs(cats_dir)
 
     imgur_config = get_config()
-    for tag in tags:
+    for tag in args.tags:
         print 'Downloading images for tag ' + tag
         get_images_of_tag(imgur_config, tag, sort='time')
 
