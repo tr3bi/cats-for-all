@@ -138,8 +138,8 @@ def get_images_of_tag(imgur_config, tag, db_file_path, num=150, sort='viral'):
 def parse_arguments():
     parser = argparse.ArgumentParser()
     parser.add_argument('tags', nargs='+', default=['cat'], help='The tags the should be examined.')
-    parser.add_argument('--db-file', dest='db_file_path', default=DEFAULT_DB_FILE_PATH, help='The path to the DB file contains the already downloaded pictures.')
-    parser.add_argument('--imgur-config', dest='imgur_config_path', default=DEFAULT_IMGUR_CONFIG_PATH, help='The path to the JSON file contains the imgur secret and application ID.')
+    parser.add_argument('--db-file', '-d', dest='db_file_path', default=DEFAULT_DB_FILE_PATH, help='The path to the DB file contains the already downloaded pictures.')
+    parser.add_argument('--imgur-config', '-f', dest='imgur_config_path', default=DEFAULT_IMGUR_CONFIG_PATH, help='The path to the JSON file contains the imgur secret and application ID.')
     return parser.parse_args()
 
 
