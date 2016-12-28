@@ -14,6 +14,7 @@ DEFAULT_IMGUR_CONFIG_PATH = './config.json'
 IMGUR_SORT_CHOICES = ['viral', 'time']
 DEFAULT_SORT = 'time'
 MAX_PICTURES_AMOUNT = 150
+DEFAULT_OUTPUT_PATH = './'
 
 ImageData = namedtuple('ImageData', ['id', 'link', 'title', 'height', 'width'])
 ImgurConfig = namedtuple('ImgurConfig', ['id', 'secret'])
@@ -84,7 +85,7 @@ def choose_only_medium(image):
     return True
 
 
-def get_todays_dir(tag, base_dir='.', dir_frmt=DIR_NAME_FRMT):
+def get_todays_dir(tag, base_dir=DEFAULT_OUTPUT_PATH, dir_frmt=DIR_NAME_FRMT):
     todays_dir_name = dir_frmt % (tag, time.strftime('%Y-%m-%d'))
     return os.path.join(base_dir, todays_dir_name)
 
@@ -147,7 +148,7 @@ def parse_arguments():
     parser.add_argument('--db-file', '-d', dest='db_file_path', default=DEFAULT_DB_FILE_PATH, help='The path to the DB file contains the already downloaded pictures.')
     parser.add_argument('--imgur-config', '-f', dest='imgur_config_path', default=DEFAULT_IMGUR_CONFIG_PATH, help='The path to the JSON file contains the imgur secret and application ID.')
     parser.add_argument('--only-medium', '-m', dest='predicate', default=choose_all, const=choose_only_medium, action='store_const', help='If supplied, only medium picutres will be saved.')
-    parser.add_argument('--sort', '-s', dest='sort', default=DEFAULT_SORT, choice=IMGUR_SORT_CHOICES, help='The method used to sort the videos when sampling imgur.')
+    parser.add_argument('--sort', '-s', dest='sort', default=DEFAULT_SORT, choices=IMGUR_SORT_CHOICES, help='The method used to sort the videos when sampling imgur.')
     parser.add_argument('--output-path', '-o', dest='output', default=DEFAULT_OUTPUT_PATH, help='The default path to which write the output.')
     return parser.parse_args()
 
