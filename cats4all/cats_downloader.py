@@ -6,6 +6,7 @@ import sqlite3
 import itertools
 from collections import namedtuple
 import json
+import pdb
 
 
 DIR_NAME_FRMT = 'cats-%s'
@@ -70,6 +71,7 @@ def does_image_exist(image_id, table_name='cats'):
 
 
 def predicate(image):
+    return True
     if image.height < 500 or image.width < 300:
         return False
     if image.height > 1200:
@@ -82,6 +84,7 @@ def get_todays_dir(dir_frmt=DIR_NAME_FRMT):
 
 
 def remove_existing(images_data):
+    print str(len(images_data)) + '!!!'
     nonexisiting_images = []
     for i in images_data:
         if not does_image_exist(i.id):
@@ -100,8 +103,11 @@ def flatten_items(items, client):
 def get_images_data_by_tag(imgur_config, tag, num=150, sort='viral'):
     client = imgurpython.ImgurClient(imgur_config.id, imgur_config.secret)
     images_by_tag = client.gallery_tag(tag, sort=sort)
-    images_data = (i for i in flatten_items(images_by_tag.items, client) if predicate(i))
-    return itertools.islice(images_data, num)
+    images_data = [i for i in flatten_items(images_by_tag.items, client) if predicate(i)]
+    # return itertools.islice(images_data, num)
+    print len(images_data), '???'
+    # pdb.set_trace()
+    return images_data[:num]
 
 
 def get_images_of_tag(imgur_config, tag, num=150, sort='viral'):
@@ -111,12 +117,12 @@ def get_images_of_tag(imgur_config, tag, num=150, sort='viral'):
     while continue_download:
         images_data = get_images_data_by_tag(imgur_config, tag, num, sort)
 
-        images_data = remove_existing(images_data)
-        print len(images_data)
-        count_images += len(images_data)
+        new_images_data = remove_existing(images_data)
+        print len(new_images_data)
+        count_images += len(new_images_data)
         curr_date = time.strftime('%Y-%m-%d')
 
-        for i in images_data:
+        for i in new_images_data:
             file_name = '%s\\%s.jpg'%(get_todays_dir(), i.id)
             try:
                 print i.title
@@ -126,7 +132,7 @@ def get_images_of_tag(imgur_config, tag, num=150, sort='viral'):
                 f.write(requests.get(i.link).content)
                 add_to_db(i.id, curr_date)
         current_page += 1
-        if len(images_data) == 0 or count_images >= num:
+        if len(new_images_data) == 0 or count_images >= num:
             continue_download = False
 
 
