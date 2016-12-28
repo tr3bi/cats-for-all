@@ -11,12 +11,13 @@ import argparse
 DIR_NAME_FRMT = 'cats-%s'
 tags = ['cat', 'cats', 'lolcat', 'lolcats']
 DEFAULT_DB_FILE_PATH = './cats2.db'
+DEFAULT_IMGUR_CONFIG_PATH = './config.json'
 
 ImageData = namedtuple('ImageData', ['id', 'link', 'title', 'height', 'width'])
 ImgurConfig = namedtuple('ImgurConfig', ['id', 'secret'])
 
 
-def get_config(config_path='./config.json'):
+def get_config(config_path=DEFAULT_IMGUR_CONFIG_PATH):
     with open(config_path, 'r') as config_file:
         config = json.load(config_file)        
     # Perhaps: return ImgurConfig(**config)
@@ -138,6 +139,7 @@ def parse_arguments():
     parser = argparse.ArgumentParser()
     parser.add_argument('tags', nargs='+', default=['cat'], help='The tags the should be examined.')
     parser.add_argument('--db-file', dest='db_file_path', default=DEFAULT_DB_FILE_PATH, help='The path to the DB file contains the already downloaded pictures.')
+    parser.add_argument('--imgur-config', dest='imgur_config_path', default=DEFAULT_IMGUR_CONFIG_PATH, help='The path to the JSON file contains the imgur secret and application ID.')
     return parser.parse_args()
 
 
@@ -150,7 +152,7 @@ def main():
     if not os.path.isdir(cats_dir):
         os.makedirs(cats_dir)
 
-    imgur_config = get_config()
+    imgur_config = get_config(args.imgur_config_path)
     for tag in args.tags:
         print 'Downloading images for tag ' + tag
         get_images_of_tag(imgur_config, tag, args.db_file_path, sort='time')
