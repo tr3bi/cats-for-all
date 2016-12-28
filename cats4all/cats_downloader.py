@@ -8,7 +8,7 @@ from collections import namedtuple
 import json
 import argparse
 
-DIR_NAME_FRMT = 'cats-%s'
+DIR_NAME_FRMT = '%s-%s'
 DEFAULT_DB_FILE_PATH = './cats.db'
 DEFAULT_IMGUR_CONFIG_PATH = './config.json'
 IMGUR_SORT_CHOICES = ['viral', 'time']
@@ -84,8 +84,9 @@ def choose_only_medium(image):
     return True
 
 
-def get_todays_dir(dir_frmt=DIR_NAME_FRMT):
-    return dir_frmt % (time.strftime('%Y-%m-%d'))
+def get_todays_dir(tag, base_dir='.', dir_frmt=DIR_NAME_FRMT):
+    todays_dir_name = dir_frmt % (tag, time.strftime('%Y-%m-%d'))
+    return os.path.join(base_dir, todays_dir_name)
 
 
 def remove_existing(images_data, db_file_path):
@@ -158,7 +159,7 @@ def main():
 
     imgur_config = get_config(args.imgur_config_path)
     for tag in args.tags:
-        dst_dir = get_todays_dir()
+        dst_dir = get_todays_dir(tag)
         if not os.path.isdir(dst_dir):
             os.makedirs(dst_dir)
         print '* Downloading images for tag ' + tag
