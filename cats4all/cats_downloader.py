@@ -9,6 +9,7 @@ import json
 import argparse
 
 DIR_NAME_FRMT = 'cats-%s'
+tags = ['cat', 'cats', 'lolcat', 'lolcats']
 DB_FILE_NAME = 'cats2.db'
 
 ImageData = namedtuple('ImageData', ['id', 'link', 'title', 'height', 'width'])
@@ -149,7 +150,9 @@ def main():
         os.makedirs(cats_dir)
 
     imgur_config = get_config()
-    get_images_of_tag(imgur_config, tag, sort='time')
+    for tag in tags:
+        print 'Downloading images for tag ' + tag
+        get_images_of_tag(imgur_config, tag, sort='time')
 
 
 if __name__ == '__main__':
