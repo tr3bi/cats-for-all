@@ -6,8 +6,7 @@ import sqlite3
 import itertools
 from collections import namedtuple
 import json
-import pdb
-
+import argparse
 
 DIR_NAME_FRMT = 'cats-%s'
 tag = 'cat'
@@ -106,7 +105,6 @@ def get_images_data_by_tag(imgur_config, tag, num=150, sort='viral'):
     images_data = [i for i in flatten_items(images_by_tag.items, client) if predicate(i)]
     # return itertools.islice(images_data, num)
     print len(images_data), '???'
-    # pdb.set_trace()
     return images_data[:num]
 
 
@@ -134,6 +132,12 @@ def get_images_of_tag(imgur_config, tag, num=150, sort='viral'):
         current_page += 1
         if len(new_images_data) == 0 or count_images >= num:
             continue_download = False
+
+
+def parse_arguments():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('tags', nargs='+', help='The tags the should be examined.')
+    return parser.parse_args()
 
 
 def main():
