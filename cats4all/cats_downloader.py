@@ -112,7 +112,7 @@ def get_images_data_by_tag(imgur_config, tag, predicate, num=MAX_PICTURES_AMOUNT
     return images_data[:num]
 
 
-def get_images_of_tag(imgur_config, tag, db_file_path, predicate, num=MAX_PICTURES_AMOUNT, sort=DEFAULT_SORT):
+def get_images_of_tag(imgur_config, tag, db_file_path, predicate, dst_dir, num=MAX_PICTURES_AMOUNT, sort=DEFAULT_SORT):
     current_page = 1
     continue_download = True
     count_images = 0
@@ -125,7 +125,8 @@ def get_images_of_tag(imgur_config, tag, db_file_path, predicate, num=MAX_PICTUR
         curr_date = time.strftime('%Y-%m-%d')
 
         for i in new_images_data:
-            file_name = '%s\\%s.jpg'%(get_todays_dir(), i.id)
+            file_name = str(i.id) + '.jpg'
+            file_path = os.path.join(dst_dir, file_name)
             try:
                 print i.title
             except UnicodeEncodeError as e:
@@ -154,14 +155,14 @@ def main():
     if not os.path.isfile(args.db_file_path):
         init_db(args.db_file_path)
 
-    cats_dir = get_todays_dir()
-    if not os.path.isdir(cats_dir):
-        os.makedirs(cats_dir)
 
     imgur_config = get_config(args.imgur_config_path)
     for tag in args.tags:
+        dst_dir = get_todays_dir()
+        if not os.path.isdir(dst_dir):
+            os.makedirs(dst_dir)
         print '* Downloading images for tag ' + tag
-        get_images_of_tag(imgur_config, tag, args.db_file_path, args.predicate, num=args.max_amount, sort=args.sort)
+        get_images_of_tag(imgur_config, tag, args.db_file_path, args.predicate, dst_dir, num=args.max_amount, sort=args.sort)
 
 
 if __name__ == '__main__':
