@@ -87,7 +87,6 @@ def get_todays_dir(dir_frmt=DIR_NAME_FRMT):
 
 
 def remove_existing(images_data, db_file_path):
-    print str(len(images_data)) + '!!!'
     nonexisiting_images = []
     for i in images_data:
         if not does_image_exist(i.id, db_file_path):
@@ -107,8 +106,7 @@ def get_images_data_by_tag(imgur_config, tag, predicate, num=150, sort='viral'):
     client = imgurpython.ImgurClient(imgur_config.id, imgur_config.secret)
     images_by_tag = client.gallery_tag(tag, sort=sort)
     images_data = [i for i in flatten_items(images_by_tag.items, client) if predicate(i)]
-    # return itertools.islice(images_data, num)
-    print len(images_data), '???'
+    print '* A total number of %s picutres of tag %s matched the predicate' % (len(images_data), tag)
     return images_data[:num]
 
 
@@ -120,7 +118,7 @@ def get_images_of_tag(imgur_config, tag, db_file_path, predicate, num=150, sort=
         images_data = get_images_data_by_tag(imgur_config, tag, predicate, num, sort)
 
         new_images_data = remove_existing(images_data, db_file_path)
-        print len(new_images_data)
+        print '* There are %s new pictures of tag %s' % (len(new_images_data), tag)
         count_images += len(new_images_data)
         curr_date = time.strftime('%Y-%m-%d')
 
@@ -129,7 +127,7 @@ def get_images_of_tag(imgur_config, tag, db_file_path, predicate, num=150, sort=
             try:
                 print i.title
             except UnicodeEncodeError as e:
-                print 'Could not print image name. ID ' + i.id
+                print '* Could not print image name. ID ' + i.id
             with open(file_name,'wb') as f:
                 f.write(requests.get(i.link).content)
                 add_to_db(i.id, curr_date, db_file_path)
@@ -158,7 +156,7 @@ def main():
 
     imgur_config = get_config(args.imgur_config_path)
     for tag in args.tags:
-        print 'Downloading images for tag ' + tag
+        print '* Downloading images for tag ' + tag
         get_images_of_tag(imgur_config, tag, args.db_file_path, args.predicate, sort='time')
 
 
